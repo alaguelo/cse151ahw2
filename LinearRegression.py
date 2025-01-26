@@ -49,16 +49,17 @@ class Linear_Regression():
         ############### START TODO 1 ###############
         # Normalize the data using the formula provided in lecture
         if self.normalize:            
-            raise NotImplementedError
-            self.X = ((X - min)/(max - min))
+           # raise NotImplementedError
+            self.X = ((self.X - self.min)/(self.max - self.min))
         ############### END TODO 1 ###############
 
         ############### START TODO 2 ###############
         # Add bias (if necessary) by concatanating a constant column into X
         # Hint: go through HW1 Q5 might be helpful
         if self.intercept:
-            raise NotImplementedError
-            self.X = ...
+           # raise NotImplementedError
+            constCol = np.ones((self.X.shape[0], 1))
+            self.X = np.hstack((self.X, constCol))
         ############### END TODO 2 ###############
 
         # initialize coefficient
@@ -77,19 +78,20 @@ class Linear_Regression():
         # Hint: Find the model's prediction from the given inputs with the 
         #       coefficient, then calculate the gradient
         # If you forgot the formula, find them in lecture 4 and 5
-        raise NotImplementedError
-        grad = ...
+       # raise NotImplementedError
+        prediction = self.X @ self.coef
+        grad = coef * (self.X.T @ (self.y - prediction))
         ############### END TODO 3 ###############
 
         ############### START TODO 4 ###############
         # Implement regularization penalty
         # Hint: Use self.lam
         if self.penalty == 'l2':
-            raise NotImplementedError
-            grad += ...
+           # raise NotImplementedError
+            grad += 2 * self.lam * self.coef
         elif self.penalty == 'l1':
-            raise NotImplementedError
-            grad += ...
+           # raise NotImplementedError
+            grad += (self.lam * self.coef) / np.sign(self.coef)
         else: 
             pass
         ############### END TODO 4 ###############
@@ -101,25 +103,25 @@ class Linear_Regression():
         for i in range(self.num_iter):
 
             ############### START TODO 5 ###############
-            raise NotImplementedError
+           # raise NotImplementedError
             # calculate prediction y based on current coefficients (self.coef)                              
-            previous_y_hat = ...
+            previous_y_hat = self.X @ self.coef
             grad = self.gradient()
             # calculate the new coefficients after incorporating the gradient
-            temp_coef = ...
+            temp_coef = self.coef - (self.alpha * grad)
             ############### END TODO 5 ###############
 
             ############### START TODO 6 ###############
             # calculate regularization cost (alias: regularization loss) based on
             # self.coef and temp_coef
 
-            raise NotImplementedError
+           # raise NotImplementedError
             if self.penalty == 'l2':
-                previous_reg_cost = ...
-                current_reg_cost = ...
+                previous_reg_cost = 2 * self.lam * self.coef
+                current_reg_cost = 2 * self.lam * temp_coef
             elif self.penalty == 'l1':
-                previous_reg_cost = ...
-                current_reg_cost = ...
+                previous_reg_cost = (self.lam * self.coef) / np.sign(self.coef)
+                current_reg_cost = (self.lam * temp_coef) / np.sign(temp_coef)
             else:
                 previous_reg_cost = 0
                 current_reg_cost = 0
@@ -128,9 +130,10 @@ class Linear_Regression():
             ############### START TODO 7 ###############
             # Calculate error (alias: loss) using sum squared loss 
             # and add regularization cost
-            raise NotImplementedError
-            pre_error = np.sum(np.square(...)) + previous_reg_cost
-            current_error = np.sum(np.square(...)) + current_reg_cost
+           # raise NotImplementedError
+            pre_error = np.sum(np.square(self.y - previous_y_hat)) + previous_reg_cost
+            curr_y_hat = self.X @ temp_coef
+            current_error = np.sum(np.square(self.y - curr_y_hat)) + current_reg_cost
             ############### END TODO 7 ###############
 
             # Early Stop: early stop is triggered if loss is not decreasing 
@@ -147,16 +150,16 @@ class Linear_Regression():
             # Rules: if current error is smaller than previous error, 
             # multiply the current learning rate by 1.3 and update coefficients, 
             # otherwise by 0.9 and do nothing with coefficients
-            raise NotImplementedError
-            if current_error < pre_error:
-                self.alpha = ... if self.adaptive else self.alpha
-                ...
+          #  raise NotImplementedError
+            if np.mean(current_error) < np.mean(pre_error):
+                self.alpha = self.alpha * 1.3 if self.adaptive else self.alpha
+                self.coef = temp_coef
             else:
-                self.alpha = ... if self.adaptive else self.alpha
+                self.alpha = self.alpha * 0.9 if self.adaptive else self.alpha
             ############### END TODO 8 ###############
 
             # record stats
-            self.loss.append(float(current_error))
+            self.loss.append(float(np.mean(current_error)))
             if i % 1000000 == 0:
                 print('-----------------------')
                 print('Iteration: ' +  str(i))
@@ -174,12 +177,13 @@ class Linear_Regression():
         ############### START TODO 9 ###############
         # add bias (if necessary, same as TODO 2)
         if self.intercept:
-            raise NotImplementedError
-            X = ...
+         #   raise NotImplementedError
+            constCol = np.ones((X.shape[0], 1))
+            X = np.hstack((X, constCol))
 
         # Find the model's predictions
         # Hint: Use matrix multiplication ('@' might come in handy here)
-        y = ...
+        y = X @ self.coef
         return y
         ############### END TODO 9 ###############
 
